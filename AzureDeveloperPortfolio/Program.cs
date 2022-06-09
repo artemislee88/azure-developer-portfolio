@@ -1,9 +1,24 @@
+using AzureDeveloperPortfolio.Data;
+using AzureDeveloperPortfolio.Services;
+using Microsoft.EntityFrameworkCore;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+builder.Services.AddDbContextFactory<PortfolioContext>(
+	(IServiceProvider serviceProvider, DbContextOptionsBuilder options) =>
+	{
+		options.UseCosmos(
+			builder.Configuration["Cosmos:EndPoint"],
+			builder.Configuration["Cosmos:AccessKey"],
+			builder.Configuration["Cosmos:DatabaseName"]
+			?? throw new InvalidOperationException("Connection string 'PortfolioContext' not found."));
+	});
+
+builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 
 WebApplication app = builder.Build();
 
