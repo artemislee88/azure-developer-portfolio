@@ -1,0 +1,61 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+name: $(Date:yyyy-mm-dd-HH-mm)$(Rev:.r)
+
+trigger:
+- '*'
+
+jobs:
+  - job: 'Build_PublishArtifact'
+    displayName: 'Build and Publish Artifact'
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    variables:
+      solution: '**/*.sln'
+      buildConfiguration: 'Release'
+      dotnetSdkVersion: '6.x'
+      wwwrootDir: 'Portfolio/wwwroot'
+
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
+      inputs:
+        packageType: 'sdk'
+        version: $(dotnetSdkVersion)
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
+      displayName: 'Write build info'
+      workingDirectory: $(wwwrootDir)
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore project dependencies'
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build project - $(buildConfiguration)'
+      inputs:
+        command: 'build'
+        arguments: '--configuration $(buildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish project - $(buildConfiguration)'
+      inputs:
+        command: 'publish'
+        projects: '**/*.csproj'
+        publishWebProjects: true
+        arguments: '--no-build --configuration $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/WebApp'
+        zipAfterPublish: true
+        modifyOutputPath: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish WebApp to Artifact Staging'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)/WebApp'
+        artifact: 'drop'
+        publishLocation: 'pipeline'
