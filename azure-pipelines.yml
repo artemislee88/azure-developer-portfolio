@@ -17,7 +17,7 @@ jobs:
       solution: '**/*.sln'
       buildConfiguration: 'Release'
       dotnetSdkVersion: '6.x'
-      wwwrootDir: 'Portfolio/wwwroot'
+      wwwrootDir: 'AzureDeveloperPortfolio/wwwroot'
 
     steps:
     - task: UseDotNet@2
