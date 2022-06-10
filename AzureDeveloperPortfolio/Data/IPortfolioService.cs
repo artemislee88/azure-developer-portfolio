@@ -2,5 +2,6 @@
 {
 	public interface IPortfolioService
 	{
+		Task<string> CreateProjectAsync(Project project);
 	}
 }

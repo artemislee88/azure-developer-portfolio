@@ -5,6 +5,7 @@
 		public Tag(string tagName)
 		{
 			TagName = tagName;
+			Projects = new List<ProjectSummary>();
 		}
 
 		public string TagName { get; set; }

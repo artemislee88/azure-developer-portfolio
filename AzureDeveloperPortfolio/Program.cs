@@ -17,7 +17,6 @@ builder.Services.AddDbContextFactory<PortfolioContext>(
 			builder.Configuration["Cosmos:DatabaseName"]
 			?? throw new InvalidOperationException("Connection string 'PortfolioContext' not found."));
 	});
-
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 
 WebApplication app = builder.Build();
@@ -28,7 +27,23 @@ if (!app.Environment.IsDevelopment())
 	app.UseExceptionHandler("/Error");
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
+	using (IServiceScope? scope = app.Services.CreateScope())
+	{
+		PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
+		context.Database.EnsureCreated();
+	}
 }
+else
+{
+	app.UseDeveloperExceptionPage();
+	using (IServiceScope? scope = app.Services.CreateScope())
+	{
+		PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
+		context.Database.EnsureDeleted();
+		context.Database.EnsureCreated();
+	}
+}
+
 
 app.UseHttpsRedirection();
 
