@@ -6,6 +6,15 @@
 		{
 		}
 
+		public ProjectSummary(Project project)
+		{
+			ProjectUid = project.Uid;
+			ProjectName = project.ProjectName;
+			ShortDescription = project.ShortDescription;
+			ProfileScreenshot = project.ProfileScreenshot;
+			LastUpdated = project.LastUpdated;
+		}
+
 		public string ProjectUid { get; set; } = string.Empty;
 		public string ProjectName { get; set; } = string.Empty;
 		public string ShortDescription { get; set; } = string.Empty;

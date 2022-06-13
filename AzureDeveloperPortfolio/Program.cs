@@ -36,12 +36,10 @@ if (!app.Environment.IsDevelopment())
 else
 {
 	app.UseDeveloperExceptionPage();
-	using (IServiceScope? scope = app.Services.CreateScope())
-	{
-		PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
-		context.Database.EnsureDeleted();
-		context.Database.EnsureCreated();
-	}
+	using IServiceScope? scope = app.Services.CreateScope();
+	PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
+	context.Database.EnsureDeleted();
+	context.Database.EnsureCreated();
 }
 
 
