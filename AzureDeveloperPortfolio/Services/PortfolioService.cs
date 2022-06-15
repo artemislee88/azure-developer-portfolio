@@ -5,11 +5,13 @@ namespace AzureDeveloperPortfolio.Services
 {
 	public class PortfolioService : IPortfolioService
 	{
+		private static readonly string Featured = nameof(Featured);
+		private static readonly string Index = nameof(Index);
 		private readonly IDbContextFactory<PortfolioContext> _contextFactory;
-		public PortfolioService(IDbContextFactory<PortfolioContext> contextFactory)
-		{
+
+		public PortfolioService(IDbContextFactory<PortfolioContext> contextFactory) =>
 			_contextFactory = contextFactory;
-		}
+
 
 		public async Task<string> CreateProjectAsync(Project newProject)
 		{
@@ -19,6 +21,49 @@ namespace AzureDeveloperPortfolio.Services
 			context.Add(newProject);
 			await context.SaveChangesAsync();
 			return newProject.Uid;
+		}
+
+		public async Task<Project?> GetProjectAsync(string projectUid)
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			Project? project = await context.Projects
+				.WithPartitionKey(projectUid)
+				.SingleOrDefaultAsync(p => p.Uid == projectUid);
+			if (project is null)
+			{
+				return null;
+			}
+			return project;
+		}
+
+		public async Task UpdateProjectAsync(Project updatedProject)
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			Project? project = await context.Projects
+				.WithPartitionKey(updatedProject.Uid)
+				.SingleOrDefaultAsync(p => p.Uid == updatedProject.Uid);
+			if (project is null)
+			{
+				return;
+			}
+
+			await HandleTagsAsync(context, updatedProject);
+
+			project.ProjectName = updatedProject.ProjectName;
+			project.ShortDescription = updatedProject.ShortDescription;
+			project.Summary = updatedProject.Summary;
+			project.Markdown = updatedProject.Markdown;
+			project.Screenshots = updatedProject.Screenshots;
+			project.ProfileScreenshot = updatedProject.ProfileScreenshot;
+			project.RepositoryURL = updatedProject.RepositoryURL;
+			project.SiteURL = updatedProject.SiteURL;
+			project.IsDeployed = updatedProject.IsDeployed;
+			project.Hosting = updatedProject.Hosting;
+			project.Tags = updatedProject.Tags;
+			project.Published = updatedProject.Published;
+			project.Featured = updatedProject.Featured;
+
+			await context.SaveChangesAsync();
 		}
 
 		private static async Task HandleTagsAsync(
@@ -73,8 +118,8 @@ namespace AzureDeveloperPortfolio.Services
 						? storedTagNames
 						: storedTagNames.Except(removedTagNames).ToList();
 
-					// Ensure "index" Tag is updated
-					remainingTagNames.Add("index");
+					// Ensure "Index" Tag is updated
+					remainingTagNames.Add(nameof(Index));
 					await UpdateProjectSummariesInTagsAsync(
 					   context, project, remainingTagNames);
 				}
@@ -87,8 +132,8 @@ namespace AzureDeveloperPortfolio.Services
 				{
 					addedTagNames = project.Tags.Select(tag => tag).ToList();
 				}
-				// Ensure "index" Tag is updated
-				addedTagNames.Add("index");
+				// Ensure "Index" Tag is updated
+				addedTagNames.Add(nameof(Index));
 				await AddProjectSummariesToTagsAsync(context, project, addedTagNames);
 			}
 		}
@@ -106,7 +151,7 @@ namespace AzureDeveloperPortfolio.Services
 				if (addedTag is null)
 				{
 					addedTag = new Tag(tagName);
-					await context.Tags.AddAsync(addedTag);
+					context.Tags.Add(addedTag);
 				}
 				else
 				{
@@ -118,7 +163,7 @@ namespace AzureDeveloperPortfolio.Services
 					ProjectName = project.ProjectName,
 					ShortDescription = project.ShortDescription,
 					ProfileScreenshot = project.ProfileScreenshot,
-					LastUpdated = project.LastUpdated,
+					LastUpdated = project.LastUpdated
 				});
 			}
 		}
@@ -128,8 +173,8 @@ namespace AzureDeveloperPortfolio.Services
 			foreach (string removedTagName in removedTagNames)
 			{
 				Tag? removedTag = await context.Tags
-					.Where(t => t.TagName == removedTagName)
-					.FirstOrDefaultAsync();
+					.WithPartitionKey(removedTagName)
+					.SingleOrDefaultAsync(t => t.TagName == removedTagName);
 
 				if (removedTag is not null)
 				{
@@ -139,8 +184,8 @@ namespace AzureDeveloperPortfolio.Services
 					{
 						removedTag.Projects.Remove(deletedProjectSummary);
 
-						// If Tag.Projects is empty, delete Tag
-						if (removedTag.Projects is null)
+						// If Tag.Projects is empty and Tag is not the "featured" Tag, delete Tag
+						if (removedTag.TagName != nameof(Featured) && !removedTag.Projects.Any())
 						{
 							context.Remove(removedTag);
 						}
@@ -159,8 +204,8 @@ namespace AzureDeveloperPortfolio.Services
 			foreach (string existingTagName in existingTagNames)
 			{
 				Tag? existingTag = await context.Tags
-					.Where(t => t.TagName == existingTagName)
-					.FirstOrDefaultAsync();
+					.WithPartitionKey(existingTagName)
+					.SingleOrDefaultAsync(t => t.TagName == existingTagName);
 				if (existingTag is not null)
 				{
 					ProjectSummary? staleProjectSummary =
@@ -181,6 +226,19 @@ namespace AzureDeveloperPortfolio.Services
 					context.Entry(existingTag).State = EntityState.Modified;
 				}
 			}
+		}
+
+		public async Task<Tag?> GetTagAsync(string tagName)
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			Tag? tag = await context.Tags
+				.WithPartitionKey(tagName)
+				.SingleOrDefaultAsync(t => t.TagName == tagName);
+			if (tag is null)
+			{
+				return null;
+			}
+			return tag;
 		}
 
 	}

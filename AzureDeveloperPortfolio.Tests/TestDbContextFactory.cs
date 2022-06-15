@@ -1,4 +1,5 @@
-﻿using AzureDeveloperPortfolio.Services;
+﻿using AzureDeveloperPortfolio.Data;
+using AzureDeveloperPortfolio.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -8,6 +9,8 @@ namespace AzureDeveloperPortfolio.Tests
 	{
 		private readonly DbContextOptions<PortfolioContext> _options;
 		private readonly IConfiguration _config;
+		private static readonly string Featured = nameof(Featured);
+
 		public TestDbContextFactory()
 		{
 			ConfigurationBuilder? builder = new();
@@ -20,13 +23,15 @@ namespace AzureDeveloperPortfolio.Tests
 				_config["Cosmos:EndPoint"],
 				_config["Cosmos:AccessKey"],
 				_config["Cosmos:DatabaseName"]
-				?? throw new InvalidOperationException("Connection string 'PortfolioContext' not found."))
+				?? throw new InvalidOperationException("Connection strings 'PortfolioContext' not found."))
+				.EnableSensitiveDataLogging()
 				.Options;
 
 			using PortfolioContext? context = CreateDbContext();
 			context.Database.EnsureDeleted();
 			context.Database.EnsureCreated();
-
+			context.Tags.Add(new Tag(Featured));
+			context.SaveChangesAsync();
 		}
 
 		public PortfolioContext CreateDbContext()

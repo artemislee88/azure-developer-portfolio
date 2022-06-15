@@ -4,7 +4,7 @@ namespace AzureDeveloperPortfolio.Tests
 {
 	public class ProjectSummaryTests
 	{
-		[Theory]
+		[Theory(DisplayName = "EqualOverideTest_True")]
 		[MemberData(nameof(ProjectSummaryTestData.SummaryEqualsData), MemberType = typeof(ProjectSummaryTestData))]
 		public void ProjectSummaryEqualOverideTest_True(ProjectSummary ps1, ProjectSummary ps2)
 		{
@@ -12,7 +12,7 @@ namespace AzureDeveloperPortfolio.Tests
 			Assert.True(areEqual);
 		}
 
-		[Theory]
+		[Theory(DisplayName = "EqualOverideTest_False")]
 		[MemberData(nameof(ProjectSummaryTestData.SummaryNotEqualsData), MemberType = typeof(ProjectSummaryTestData))]
 		public void ProjectSummaryEqualOverideTest_False(ProjectSummary ps1, ProjectSummary ps2)
 		{
