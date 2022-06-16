@@ -7,5 +7,6 @@
 		Task UpdateProjectAsync(Project project);
 		Task DeleteProjectAsync(string projectUid);
 		Task<Tag?> GetTagAsync(string tagName);
+		Task<List<ProjectSummary>?> QueryProjectsByTagAsync(List<string> tags);
 	}
 }

@@ -41,8 +41,7 @@
 			return HashCode.Combine(ProjectUid, ProjectName, ShortDescription, ProfileScreenshot, LastUpdated);
 		}
 
-		public override string ToString() =>
-			$"{ProjectName} Summary - {ProjectUid}";
+		public override string ToString() => $"{ProjectName} - {LastUpdated}";
 
 	}
 }

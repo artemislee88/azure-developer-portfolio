@@ -7,6 +7,7 @@ namespace AzureDeveloperPortfolio.Tests
 	[TestCaseOrderer("AzureDeveloperPortfolio.Tests.Orderers.PriorityOrderer", "AzureDeveloperPortfolio.Tests")]
 	public class PortfolioServiceTests : IClassFixture<TestDbContextFactory>
 	{
+		private static readonly string Featured = nameof(Featured);
 		public TestDbContextFactory ContextFactory { get; }
 		public PortfolioServiceTests(TestDbContextFactory contextFactory) => ContextFactory = contextFactory;
 
@@ -119,7 +120,7 @@ namespace AzureDeveloperPortfolio.Tests
 		{
 			PortfolioService service = new(ContextFactory);
 			Tag? actualTag = service.GetTagAsync(tagName).Result;
-			IEnumerable<ProjectSummary>? actualSummaries = actualTag?.Projects;
+			IEnumerable<ProjectSummary>? actualSummaries = actualTag?.Projects.OrderBy(s => s.ProjectUid);
 
 			Assert.NotNull(actualTag);
 			Assert.All(actualSummaries, item => Assert.IsType<ProjectSummary>(item));
@@ -157,7 +158,7 @@ namespace AzureDeveloperPortfolio.Tests
 		{
 			PortfolioService service = new(ContextFactory);
 			Tag? actualTag = service.GetTagAsync(tagName).Result;
-			IEnumerable<ProjectSummary>? actualSummaries = actualTag?.Projects;
+			IEnumerable<ProjectSummary>? actualSummaries = actualTag?.Projects.OrderBy(s => s.ProjectUid);
 
 			Assert.NotNull(actualTag);
 			Assert.All(actualSummaries, item => Assert.IsType<ProjectSummary>(item));
@@ -184,8 +185,37 @@ namespace AzureDeveloperPortfolio.Tests
 
 			Assert.NotNull(actualTag);
 			Assert.All(actualSummaries, item => Assert.IsType<ProjectSummary>(item));
-			Assert.All(actualTag?.Projects, item => Assert.Equal(new DateTime(), item.LastUpdated));
 			Assert.Equal(expectedSummaries, actualSummaries);
+		}
+
+		[Fact(DisplayName = "DeleteProject_FeaturedTag_Exists"), TestPriority(00404)]
+		public void DeleteProjectAsyncTest_FeaturedTagExists()
+		{
+			PortfolioService service = new(ContextFactory);
+			Tag? featuredTag = service.GetTagAsync(nameof(Featured)).Result;
+
+			Assert.NotNull(featuredTag);
+		}
+
+		[Theory(DisplayName = "QueryProjectsByTag_Results"), TestPriority(00500)]
+		[MemberData(nameof(ProjectTestData.QueryProjectsByTagResultsData), MemberType = typeof(ProjectTestData))]
+		public void QueryProjectsByTagAsyncTest_Results(List<string> tagNames, List<ProjectSummary> expectedSummaries)
+		{
+			PortfolioService service = new(ContextFactory);
+			List<ProjectSummary>? actualSummaries = service.QueryProjectsByTagAsync(tagNames).Result;
+
+			Assert.NotNull(actualSummaries);
+			Assert.Equal(expectedSummaries, actualSummaries);
+		}
+
+		[Theory(DisplayName = "QueryProjectsByTag_NoResults"), TestPriority(00501)]
+		[MemberData(nameof(ProjectTestData.QueryProjectsByTagNoResultsData), MemberType = typeof(ProjectTestData))]
+		public void QueryProjectsByTagAsyncTest_NoResults(List<string> tagNames)
+		{
+			PortfolioService service = new(ContextFactory);
+			Task<List<ProjectSummary>?>? nullTask = service.QueryProjectsByTagAsync(tagNames);
+
+			Assert.Null(nullTask.Result);
 		}
 	}
 }

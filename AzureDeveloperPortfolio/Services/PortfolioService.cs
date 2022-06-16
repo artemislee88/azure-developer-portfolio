@@ -255,7 +255,37 @@ namespace AzureDeveloperPortfolio.Services
 			{
 				return null;
 			}
+			if (tag.Projects is not null)
+			{
+				List<ProjectSummary>? sorted =
+					tag.Projects.OrderByDescending(p => p.LastUpdated).ToList();
+				tag.Projects = sorted;
+			}
 			return tag;
+		}
+
+		public async Task<List<ProjectSummary>?> QueryProjectsByTagAsync(List<string> tagNames)
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			List<Tag>? tagList = await context.Tags.AsNoTracking()
+				.Where(t => tagNames.Contains(t.TagName))
+				.ToListAsync();
+
+			if (tagList is null) { return null; }
+			else
+			{
+
+				List<ProjectSummary> summaryResults = tagList.AsQueryable()
+					.Aggregate(tagList.First().Projects,
+					(current, next) => current.Where(t => next.Projects.Contains(t)).ToList());
+
+				if (!summaryResults.Any()) { return null; }
+
+				IOrderedEnumerable<ProjectSummary> results;
+				results = summaryResults.OrderByDescending(s => s.LastUpdated);
+
+				return results.ToList();
+			}
 		}
 
 	}

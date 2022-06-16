@@ -17,21 +17,27 @@ namespace AzureDeveloperPortfolio.Tests
 				}},
 			{ "Orchard Core", new TagTest{
 					ProjectCreate = new() {
-						"eloquent-lee-blog", "cascade-terrace-landscaping"},
+						"eloquent-lee-blog", "cascade-terrace-landscaping",
+						"southwest-shiner-league" },
 					ProjectUpdate = new() {
-						"eloquent-lee-blog", "mr-mechanical-auto" }
+						"honeybee-daycare" },
+					QueryGroup = "A"
+
 				}},
 			{ "ASP.NET", new TagTest{
 					ProjectCreate = new() {
-						"eloquent-lee-blog", "cascade-terrace-landscaping", "southwest-shiner-league" },
+						"eloquent-lee-blog", "cascade-terrace-landscaping" },
 					ProjectUpdate = new() {
-						"eloquent-lee-blog", "cascade-terrace-landscaping"}
+						"honeybee-daycare", "cascade-terrace-landscaping" },
+					QueryGroup = "A"
 				}},
 			{ "Blazor", new TagTest{
 					ProjectCreate = new() {
-						"cascade-terrace-landscaping", "southwest-shiner-league" },
+						"eloquent-lee-blog"},
 					ProjectUpdate = new() {
-						"southwest-shiner-league" }
+						"honeybee-daycare", "cascade-terrace-landscaping",
+						"eloquent-lee-blog" },
+					QueryGroup = "A"
 				}},
 			{ "SignalR", new TagTest{
 					ProjectCreate = new() { },
@@ -42,17 +48,22 @@ namespace AzureDeveloperPortfolio.Tests
 					ProjectCreate = new() {
 						"eloquent-lee-blog", "mr-mechanical-auto" },
 					ProjectUpdate = new() {
-						"cascade-terrace-landscaping", "southwest-shiner-league" }
+						"mr-mechanical-auto", "southwest-shiner-league",
+						"cascade-terrace-landscaping", "eloquent-lee-blog" },
+					QueryGroup = "B"
 				}},
 			{ "CosmosDB", new TagTest{
 					ProjectCreate = new() { },
 					ProjectUpdate = new() {
-						"southwest-shiner-league", "mr-mechanical-auto"}
+						"mr-mechanical-auto", "southwest-shiner-league",
+						"cascade-terrace-landscaping"},
+					QueryGroup = "B"
 				}},
 			{ "SQL", new TagTest{
 					ProjectCreate = new() { },
 					ProjectUpdate = new() {
-						"cascade-terrace-landscaping", "mr-mechanical-auto" }
+						"mr-mechanical-auto", "southwest-shiner-league" },
+					QueryGroup = "B"
 				}},
 			{ nameof(Featured), new TagTest{
 					ProjectCreate = new() { },
@@ -68,7 +79,6 @@ namespace AzureDeveloperPortfolio.Tests
 					Uid = "eloquent-lee-blog",
 					ProjectName = "Eloquent Lee Blogging",
 					ShortDescription = "Orchard Core CMS for an independent blogger",
-					ProfileScreenshot = "cascade-terrace-landscaping-home.png",
 					Tags = new List<string>()
 				}
 			},
@@ -78,6 +88,14 @@ namespace AzureDeveloperPortfolio.Tests
 					ProjectName = "Cascade Terrace Landscaping",
 					ShortDescription = "ASP.NET Core Web app for small business",
 					ProfileScreenshot = "cascade-terrace-landscaping-home.png",
+					Tags = new List<string>()
+				}
+			},
+			{ "honeybee-daycare", new Project
+				{
+					Uid = "honeybee-daycare",
+					ProjectName = "HoneyBee Daycare",
+					ShortDescription = "Blazor Server app for local daycare",
 					Tags = new List<string>()
 				}
 			},
@@ -157,11 +175,14 @@ namespace AzureDeveloperPortfolio.Tests
 		public static IEnumerable<object[]> UpdateProjectData()
 		{
 			List<object[]> updateProjectTests = new();
+			int d = 0;
 			foreach (string project in projects.Keys)
 			{
-				projects[project].ProjectName += " - UPDATED";
-				projects[project].ShortDescription += " - UPDATED";
+				projects[project].ProjectName += " 2.0";
+				projects[project].ShortDescription += " - Revised";
 				projects[project].Summary = "<a href='http://www.zombieipsum.com/' target='_blank'>Zombie Ipsum</a>Zombie ipsum brains reversus ab cerebellum viral inferno, brein nam rick mend grimes malum cerveau cerebro.";
+				projects[project].LastUpdated = new DateTime() + new TimeSpan(d, 0, 0, 0);
+				d++;
 				projects[project].Tags.Clear();
 				foreach (string tagName in tags.Keys)
 				{
@@ -183,7 +204,9 @@ namespace AzureDeveloperPortfolio.Tests
 				if (tags[tagName].ProjectUpdate.Any())
 				{
 					List<ProjectSummary> projectSummaries = tags[tagName].ProjectUpdate
-						.Select(p => new ProjectSummary(projects[p])).ToList();
+						.OrderBy(p => p)
+						.Select(p => new ProjectSummary(projects[p]))
+						.ToList();
 					updateTagTests.Add(new object[] { tagName, projectSummaries });
 				}
 			}
@@ -214,11 +237,14 @@ namespace AzureDeveloperPortfolio.Tests
 			List<object[]> updateTagTests = new();
 			foreach (string tagName in tags.Keys)
 			{
-				if (tags[tagName].ProjectUpdate.Any() && !tags[tagName].ProjectUpdate.All(p => !p.Equals(projects.Last().Value.Uid)))
+				if (tags[tagName].ProjectUpdate.Any() &&
+					!tags[tagName].ProjectUpdate.All(p => !p.Equals(projects.Last().Value.Uid)))
 				{
 					List<ProjectSummary> projectSummaries = tags[tagName].ProjectUpdate
 						.Where(p => !p.Equals(projects.Last().Value.Uid))
-						.Select(p => new ProjectSummary(projects[p])).ToList();
+						.OrderBy(p => p)
+						.Select(p => new ProjectSummary(projects[p]))
+						.ToList();
 					if (projectSummaries.Any())
 					{
 						updateTagTests.Add(new object[] { tagName, projectSummaries });
@@ -243,12 +269,63 @@ namespace AzureDeveloperPortfolio.Tests
 
 		public static IEnumerable<object[]> IndexTagUpdatedData()
 		{
-			List<ProjectSummary> projectSummaries = new();
+			List<ProjectSummary> summaries = new();
 			foreach (string project in projects.Keys.SkipLast(1))
 			{
-				projectSummaries.Add(new ProjectSummary(projects[project]));
+				summaries.Add(new ProjectSummary(projects[project]));
 			}
+			List<ProjectSummary> projectSummaries =
+				summaries.OrderByDescending(p => p.LastUpdated).ToList();
 			return new List<object[]> { new object[] { nameof(Index), projectSummaries } };
+		}
+
+		public static IEnumerable<object[]> QueryProjectsByTagResultsData()
+		{
+			List<object[]> queryTests = new();
+
+			IEnumerable<string>? groupA = tags.Keys.Where((t) => tags[t].QueryGroup.Equals("A"));
+			IEnumerable<string>? groupB = tags.Keys.Where((t) => tags[t].QueryGroup.Equals("B"));
+
+			queryTests.AddRange(CreateQueries(groupA));
+			queryTests.AddRange(CreateQueries(groupB));
+
+			return queryTests;
+		}
+
+		public static IEnumerable<object[]> QueryProjectsByTagNoResultsData()
+		{
+			List<string>? allValidTags = tags.Keys.Where((t) => tags[t].QueryGroup.Any()).ToList();
+			return new List<object[]> { new object[] { allValidTags } };
+		}
+
+		static List<object[]> CreateQueries(IEnumerable<string> queryGroup)
+		{
+			List<object[]> queryTests = new();
+			for (int i = queryGroup.Count(); i > 0; i--)
+			{
+				IEnumerable<string>? queryTags = queryGroup.TakeLast(i);
+				IEnumerable<string>? seed =
+					tags[queryTags.First()].ProjectUpdate
+						.Where(p => !p.Equals(projects.Last().Value.Uid));
+
+				IEnumerable<string>? results =
+					queryTags.Aggregate(seed, (current, next) =>
+						current.Where(t => tags[next].ProjectUpdate.Contains(t)));
+
+				List<ProjectSummary> projectSummaries = new();
+				if (results.Any())
+				{
+					foreach (string? result in results)
+					{
+						projectSummaries.Add(new ProjectSummary(projects[result]));
+					}
+				}
+
+				queryTests.Add(new object[]
+					{ queryTags.ToList(), projectSummaries.OrderByDescending(s => s.LastUpdated).ToList() });
+			}
+
+			return queryTests;
 		}
 
 	}

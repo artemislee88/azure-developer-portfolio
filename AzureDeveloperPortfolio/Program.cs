@@ -27,19 +27,22 @@ if (!app.Environment.IsDevelopment())
 	app.UseExceptionHandler("/Error");
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
-	using IServiceScope? scope = app.Services.CreateScope();
-	PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
-	context.Database.EnsureCreated();
 }
 else
 {
 	app.UseDeveloperExceptionPage();
-	using IServiceScope? scope = app.Services.CreateScope();
-	PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
-	context.Database.EnsureDeleted();
-	context.Database.EnsureCreated();
 }
 
+using IServiceScope? scope = app.Services.CreateScope();
+PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
+context.Database.EnsureDeleted();
+context.Database.EnsureCreated();
+IConfiguration config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+if (config is not null)
+{
+	context.Tags.Add(new Tag(config["Database:DefaultTag"]));
+	context.SaveChangesAsync();
+}
 
 app.UseHttpsRedirection();
 
