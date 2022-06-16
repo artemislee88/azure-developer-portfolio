@@ -66,8 +66,25 @@ namespace AzureDeveloperPortfolio.Services
 			await context.SaveChangesAsync();
 		}
 
+		public async Task DeleteProjectAsync(string projectUid)
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			Project? project = await context.Projects
+				.WithPartitionKey(projectUid)
+				.SingleOrDefaultAsync(p => p.Uid == projectUid);
+			if (project is null)
+			{
+				return;
+			}
+			project.Tags.Add(nameof(Index));
+			await RemoveProjectSummariesFromTagsAsync(context, project.Uid, project.Tags);
+
+			context.Remove(project);
+			await context.SaveChangesAsync();
+		}
+
 		private static async Task HandleTagsAsync(
-			PortfolioContext context, Project project)
+		PortfolioContext context, Project project)
 		{
 			// Retrieve stored Project data
 			Project? storedProject = await context.Projects
@@ -105,7 +122,7 @@ namespace AzureDeveloperPortfolio.Services
 				if (removedTagNames is not null)
 				{
 					await RemoveProjectSummariesFromTagsAsync(
-					   context, project, removedTagNames);
+					   context, project.Uid, removedTagNames);
 				}
 
 
@@ -168,7 +185,7 @@ namespace AzureDeveloperPortfolio.Services
 			}
 		}
 
-		private static async Task RemoveProjectSummariesFromTagsAsync(PortfolioContext context, Project project, IEnumerable<string> removedTagNames)
+		private static async Task RemoveProjectSummariesFromTagsAsync(PortfolioContext context, string projectUid, IEnumerable<string> removedTagNames)
 		{
 			foreach (string removedTagName in removedTagNames)
 			{
@@ -179,7 +196,7 @@ namespace AzureDeveloperPortfolio.Services
 				if (removedTag is not null)
 				{
 					ProjectSummary? deletedProjectSummary = removedTag.Projects
-						.Find(summary => summary.ProjectUid == project.Uid);
+						.Find(summary => summary.ProjectUid == projectUid);
 					if (deletedProjectSummary is not null)
 					{
 						removedTag.Projects.Remove(deletedProjectSummary);

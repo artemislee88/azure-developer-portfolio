@@ -7,7 +7,7 @@
 		}
 
 		public List<string> ProjectCreate { get; set; } = new List<string>();
-
 		public List<string> ProjectUpdate { get; set; } = new List<string>();
+
 	}
 }

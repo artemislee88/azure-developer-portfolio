@@ -25,7 +25,7 @@ namespace AzureDeveloperPortfolio.Tests
 
 
 		[Theory(DisplayName = "GetTag_Found - CreateProject.Tags_Created"), TestPriority(00102)]
-		[MemberData(nameof(ProjectTestData.TagsCreatedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(ProjectTestData.CreateProjectTagsCreatedData), MemberType = typeof(ProjectTestData))]
 		public void GetTagAsyncTest_ProjectCreate_TagsCreated(string tagName, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -114,8 +114,8 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "UpdateProject.Tags_Updated"), TestPriority(00301)]
-		[MemberData(nameof(ProjectTestData.TagsUpdatedData), MemberType = typeof(ProjectTestData))]
-		public void UpdateProjectAsyncTest_TagsUdpdated(string tagName, List<ProjectSummary> expectedSummaries)
+		[MemberData(nameof(ProjectTestData.UpdateProjectTagsUpdatedData), MemberType = typeof(ProjectTestData))]
+		public void UpdateProjectAsyncTest_TagsUpdated(string tagName, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
 			Tag? actualTag = service.GetTagAsync(tagName).Result;
@@ -127,13 +127,65 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "UpdateProject_EmptyTags_Deleted"), TestPriority(00302)]
-		[MemberData(nameof(ProjectTestData.UpdateTagsDeletedData), MemberType = typeof(ProjectTestData))]
-		public void UpdateProjectAsyncTest_IndexTagUpdated(string deletedTagName)
+		[MemberData(nameof(ProjectTestData.UpdateProjectTagsDeletedData), MemberType = typeof(ProjectTestData))]
+		public void UpdateProjectAsyncTest_TagDeleted(string deletedTagName)
 		{
 			PortfolioService service = new(ContextFactory);
 			Task<Tag?>? nullTask = service.GetTagAsync(deletedTagName);
 
 			Assert.Null(nullTask.Result);
+		}
+
+		[Theory(DisplayName = "DeleteProject"), TestPriority(00400)]
+		[MemberData(nameof(ProjectTestData.DeleteProjectData), MemberType = typeof(ProjectTestData))]
+		public void DeleteProjectAsyncTest(string projectUid)
+		{
+			PortfolioService service = new(ContextFactory);
+			Task? task = service.DeleteProjectAsync(projectUid);
+			task.Wait();
+
+			Assert.True(task.IsCompletedSuccessfully);
+
+			Task<Project?>? nullTask = service.GetProjectAsync(projectUid);
+
+			Assert.Null(nullTask.Result);
+		}
+
+		[Theory(DisplayName = "DeleteProject.Tags_Updated"), TestPriority(00401)]
+		[MemberData(nameof(ProjectTestData.DeleteProjectTagsUpdatedData), MemberType = typeof(ProjectTestData))]
+		public void DeleteProjectAsyncTest_TagsUpdated(string tagName, List<ProjectSummary> expectedSummaries)
+		{
+			PortfolioService service = new(ContextFactory);
+			Tag? actualTag = service.GetTagAsync(tagName).Result;
+			IEnumerable<ProjectSummary>? actualSummaries = actualTag?.Projects;
+
+			Assert.NotNull(actualTag);
+			Assert.All(actualSummaries, item => Assert.IsType<ProjectSummary>(item));
+			Assert.Equal(expectedSummaries, actualSummaries);
+		}
+
+		[Theory(DisplayName = "DeleteProject.Tags_Deleted"), TestPriority(00402)]
+		[MemberData(nameof(ProjectTestData.DeleteProjectTagsDeletedData), MemberType = typeof(ProjectTestData))]
+		public void DeleteProjectAsyncTest_TagsDeleted(string deletedTagName)
+		{
+			PortfolioService service = new(ContextFactory);
+			Task<Tag?>? nullTask = service.GetTagAsync(deletedTagName);
+
+			Assert.Null(nullTask.Result);
+		}
+
+		[Theory(DisplayName = "DeleteProject_IndexTag_Updated"), TestPriority(00403)]
+		[MemberData(nameof(ProjectTestData.IndexTagUpdatedData), MemberType = typeof(ProjectTestData))]
+		public void DeleteProjectAsyncTest_IndexTagUpdated(string index, List<ProjectSummary> expectedSummaries)
+		{
+			PortfolioService service = new(ContextFactory);
+			Tag? actualTag = service.GetTagAsync(index).Result;
+			IEnumerable<ProjectSummary>? actualSummaries = actualTag?.Projects;
+
+			Assert.NotNull(actualTag);
+			Assert.All(actualSummaries, item => Assert.IsType<ProjectSummary>(item));
+			Assert.All(actualTag?.Projects, item => Assert.Equal(new DateTime(), item.LastUpdated));
+			Assert.Equal(expectedSummaries, actualSummaries);
 		}
 	}
 }

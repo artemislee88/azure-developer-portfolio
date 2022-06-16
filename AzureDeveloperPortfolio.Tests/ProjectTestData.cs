@@ -7,7 +7,6 @@ namespace AzureDeveloperPortfolio.Tests
 		private static readonly string Index = nameof(Index);
 		private static readonly string Featured = nameof(Featured);
 
-
 		private readonly static Dictionary<string, TagTest> tags = new()
 		{
 			{ "Docker", new TagTest () {
@@ -20,7 +19,7 @@ namespace AzureDeveloperPortfolio.Tests
 					ProjectCreate = new() {
 						"eloquent-lee-blog", "cascade-terrace-landscaping"},
 					ProjectUpdate = new() {
-						"eloquent-lee-blog" }
+						"eloquent-lee-blog", "mr-mechanical-auto" }
 				}},
 			{ "ASP.NET", new TagTest{
 					ProjectCreate = new() {
@@ -37,7 +36,7 @@ namespace AzureDeveloperPortfolio.Tests
 			{ "SignalR", new TagTest{
 					ProjectCreate = new() { },
 					ProjectUpdate = new() {
-						"southwest-shiner-league", "mr-mechanical-auto" }
+						"mr-mechanical-auto" }
 				}},
 			{ "EF Core", new TagTest{
 					ProjectCreate = new() {
@@ -48,7 +47,7 @@ namespace AzureDeveloperPortfolio.Tests
 			{ "CosmosDB", new TagTest{
 					ProjectCreate = new() { },
 					ProjectUpdate = new() {
-						"southwest-shiner-league"}
+						"southwest-shiner-league", "mr-mechanical-auto"}
 				}},
 			{ "SQL", new TagTest{
 					ProjectCreate = new() { },
@@ -84,8 +83,7 @@ namespace AzureDeveloperPortfolio.Tests
 			},
 			{ "southwest-shiner-league", new Project
 				{
-					Uid = "southwest-shiner-le" +
-				"ague",
+					Uid = "southwest-shiner-league",
 					ProjectName = "SouthWest Shiner League",
 					ShortDescription = "Blazor WebAssembly app for community league",
 					Tags = new List<string>()
@@ -120,7 +118,7 @@ namespace AzureDeveloperPortfolio.Tests
 			return createProjectTests;
 		}
 
-		public static IEnumerable<object[]> TagsCreatedData()
+		public static IEnumerable<object[]> CreateProjectTagsCreatedData()
 		{
 			List<object[]> createTagTests = new();
 			foreach (string tagName in tags.Keys)
@@ -177,7 +175,7 @@ namespace AzureDeveloperPortfolio.Tests
 			return updateProjectTests;
 		}
 
-		public static IEnumerable<object[]> TagsUpdatedData()
+		public static IEnumerable<object[]> UpdateProjectTagsUpdatedData()
 		{
 			List<object[]> updateTagTests = new();
 			foreach (string tagName in tags.Keys)
@@ -192,7 +190,7 @@ namespace AzureDeveloperPortfolio.Tests
 			return updateTagTests;
 		}
 
-		public static IEnumerable<object[]> UpdateTagsDeletedData()
+		public static IEnumerable<object[]> UpdateProjectTagsDeletedData()
 		{
 			List<object[]> deletedTagTests = new();
 			foreach (string tagName in tags.Keys)
@@ -203,6 +201,54 @@ namespace AzureDeveloperPortfolio.Tests
 				}
 			}
 			return deletedTagTests;
+		}
+
+		public static IEnumerable<object[]> DeleteProjectData()
+		{
+			return new List<object[]> { new object[] { projects.Last().Value.Uid } };
+		}
+
+
+		public static IEnumerable<object[]> DeleteProjectTagsUpdatedData()
+		{
+			List<object[]> updateTagTests = new();
+			foreach (string tagName in tags.Keys)
+			{
+				if (tags[tagName].ProjectUpdate.Any() && !tags[tagName].ProjectUpdate.All(p => !p.Equals(projects.Last().Value.Uid)))
+				{
+					List<ProjectSummary> projectSummaries = tags[tagName].ProjectUpdate
+						.Where(p => !p.Equals(projects.Last().Value.Uid))
+						.Select(p => new ProjectSummary(projects[p])).ToList();
+					if (projectSummaries.Any())
+					{
+						updateTagTests.Add(new object[] { tagName, projectSummaries });
+					}
+				}
+			}
+			return updateTagTests;
+		}
+
+		public static IEnumerable<object[]> DeleteProjectTagsDeletedData()
+		{
+			List<object[]> deleteTagTests = new();
+			foreach (string tagName in tags.Keys)
+			{
+				if (!tagName.Equals(nameof(Featured)) && tags[tagName].ProjectUpdate.All(p => p.Equals(projects.Last().Value.Uid)))
+				{
+					deleteTagTests.Add(new object[] { tagName });
+				}
+			}
+			return deleteTagTests;
+		}
+
+		public static IEnumerable<object[]> IndexTagUpdatedData()
+		{
+			List<ProjectSummary> projectSummaries = new();
+			foreach (string project in projects.Keys.SkipLast(1))
+			{
+				projectSummaries.Add(new ProjectSummary(projects[project]));
+			}
+			return new List<object[]> { new object[] { nameof(Index), projectSummaries } };
 		}
 
 	}
