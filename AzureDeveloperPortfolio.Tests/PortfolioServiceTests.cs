@@ -14,7 +14,7 @@ namespace AzureDeveloperPortfolio.Tests
 
 
 		[Theory(DisplayName = "CreateProject"), TestPriority(00100)]
-		[MemberData(nameof(ProjectTestData.CreateProjectData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.CreateProjectData), MemberType = typeof(PortfolioServiceTestData))]
 		public void CreateProjectAsyncTest_ProjectIsCreated(Project project, string expectedUid)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -26,7 +26,7 @@ namespace AzureDeveloperPortfolio.Tests
 
 
 		[Theory(DisplayName = "GetTag_Found - CreateProject.Tags_Created"), TestPriority(00102)]
-		[MemberData(nameof(ProjectTestData.CreateProjectTagsCreatedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.CreateProjectTagsCreatedData), MemberType = typeof(PortfolioServiceTestData))]
 		public void GetTagAsyncTest_ProjectCreate_TagsCreated(string tagName, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -49,7 +49,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "CreateProject_IndexTag_Created"), TestPriority(00104)]
-		[MemberData(nameof(ProjectTestData.IndexTagCreatedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.IndexTagCreatedData), MemberType = typeof(PortfolioServiceTestData))]
 		public void CreateProjectAsyncTest_IndexTagCreated(string index, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -63,7 +63,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "GetProject_Found"), TestPriority(00200)]
-		[MemberData(nameof(ProjectTestData.GetProjectData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.GetProjectData), MemberType = typeof(PortfolioServiceTestData))]
 		public void GetProjectAsyncTest_ProjectFound(Project expectedProject, string projectUid)
 		{
 			PortfolioService? service = new(ContextFactory);
@@ -87,7 +87,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "UpdateProject"), TestPriority(00300)]
-		[MemberData(nameof(ProjectTestData.UpdateProjectData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.UpdateProjectData), MemberType = typeof(PortfolioServiceTestData))]
 		public void UpdateProjectAsyncTest_ProjectUpdated(Project expectedProject)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -115,7 +115,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "UpdateProject.Tags_Updated"), TestPriority(00301)]
-		[MemberData(nameof(ProjectTestData.UpdateProjectTagsUpdatedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.UpdateProjectTagsUpdatedData), MemberType = typeof(PortfolioServiceTestData))]
 		public void UpdateProjectAsyncTest_TagsUpdated(string tagName, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -128,7 +128,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "UpdateProject_EmptyTags_Deleted"), TestPriority(00302)]
-		[MemberData(nameof(ProjectTestData.UpdateProjectTagsDeletedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.UpdateProjectTagsDeletedData), MemberType = typeof(PortfolioServiceTestData))]
 		public void UpdateProjectAsyncTest_TagDeleted(string deletedTagName)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -138,7 +138,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "DeleteProject"), TestPriority(00400)]
-		[MemberData(nameof(ProjectTestData.DeleteProjectData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.DeleteProjectData), MemberType = typeof(PortfolioServiceTestData))]
 		public void DeleteProjectAsyncTest(string projectUid)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -153,7 +153,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "DeleteProject.Tags_Updated"), TestPriority(00401)]
-		[MemberData(nameof(ProjectTestData.DeleteProjectTagsUpdatedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.DeleteProjectTagsUpdatedData), MemberType = typeof(PortfolioServiceTestData))]
 		public void DeleteProjectAsyncTest_TagsUpdated(string tagName, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -166,7 +166,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "DeleteProject.Tags_Deleted"), TestPriority(00402)]
-		[MemberData(nameof(ProjectTestData.DeleteProjectTagsDeletedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.DeleteProjectTagsDeletedData), MemberType = typeof(PortfolioServiceTestData))]
 		public void DeleteProjectAsyncTest_TagsDeleted(string deletedTagName)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -176,7 +176,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "DeleteProject_IndexTag_Updated"), TestPriority(00403)]
-		[MemberData(nameof(ProjectTestData.IndexTagUpdatedData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.IndexTagUpdatedData), MemberType = typeof(PortfolioServiceTestData))]
 		public void DeleteProjectAsyncTest_IndexTagUpdated(string index, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -198,7 +198,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "QueryProjectsByTag_Results"), TestPriority(00500)]
-		[MemberData(nameof(ProjectTestData.QueryProjectsByTagResultsData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.QueryProjectsByTagResultsData), MemberType = typeof(PortfolioServiceTestData))]
 		public void QueryProjectsByTagAsyncTest_Results(List<string> tagNames, List<ProjectSummary> expectedSummaries)
 		{
 			PortfolioService service = new(ContextFactory);
@@ -209,7 +209,7 @@ namespace AzureDeveloperPortfolio.Tests
 		}
 
 		[Theory(DisplayName = "QueryProjectsByTag_NoResults"), TestPriority(00501)]
-		[MemberData(nameof(ProjectTestData.QueryProjectsByTagNoResultsData), MemberType = typeof(ProjectTestData))]
+		[MemberData(nameof(PortfolioServiceTestData.QueryProjectsByTagNoResultsData), MemberType = typeof(PortfolioServiceTestData))]
 		public void QueryProjectsByTagAsyncTest_NoResults(List<string> tagNames)
 		{
 			PortfolioService service = new(ContextFactory);

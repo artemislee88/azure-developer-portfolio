@@ -2,7 +2,7 @@
 
 namespace AzureDeveloperPortfolio.Tests
 {
-	public class ProjectTestData
+	public class PortfolioServiceTestData
 	{
 		private static readonly string Index = nameof(Index);
 		private static readonly string Featured = nameof(Featured);
