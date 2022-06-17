@@ -33,16 +33,16 @@ else
 	app.UseDeveloperExceptionPage();
 }
 
-using IServiceScope? scope = app.Services.CreateScope();
-PortfolioContext? context = scope.ServiceProvider.GetRequiredService<PortfolioContext>();
-context.Database.EnsureDeleted();
-context.Database.EnsureCreated();
-IConfiguration config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-if (config is not null)
-{
-	context.Tags.Add(new Tag(config["Database:DefaultTag"]));
-	context.SaveChangesAsync();
-}
+//using IServiceScope? scope = app.Services.CreateScope();
+//IDbContextFactory<PortfolioContext> contextfactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PortfolioContext>>();
+//PortfolioContext context = contextfactory.CreateDbContext();
+//
+// await context.Database.EnsureDeletedAsync();
+//await context.Database.EnsureCreatedAsync();
+//if (context.Projects.Count() == 0)
+//{
+//	DBInitializer.Initialize(contextfactory);
+//}
 
 app.UseHttpsRedirection();
 
