@@ -5,17 +5,9 @@ namespace AzureDeveloperPortfolio.Data
 {
 	public class DBInitializer
 	{
-		private static readonly string Featured = nameof(Featured);
-
 		public async static void Initialize(IDbContextFactory<PortfolioContext> contextFactory)
 		{
 			PortfolioService service = new(contextFactory);
-			Tag? featured = await service.GetTagAsync(Featured);
-			if (featured == null)
-			{
-				using PortfolioContext context = contextFactory.CreateDbContext();
-				context.Tags.Add(new Tag(Featured));
-			}
 			foreach (Project? project in projects)
 			{
 				await service.CreateProjectAsync(project);
@@ -30,8 +22,9 @@ namespace AzureDeveloperPortfolio.Data
 				ShortDescription = "Orchard Core CMS for an independent blogger",
 				LastUpdated = DateTime.Now.AddDays(-1),
 				Summary = "<a href='http://www.zombieipsum.com/' target='_blank'>Zombie Ipsum</a>Zombie ipsum brains reversus ab cerebellum viral inferno, brein nam rick mend grimes malum cerveau cerebro. De carne cerebro lumbering animata cervello corpora quaeritis. Summus thalamus brains sit​​, morbo basal ganglia vel maleficia? De braaaiiiins apocalypsi gorger omero prefrontal cortex undead survivor fornix dictum mauris.\nHi brains mindless mortuis limbic cortex soulless creaturas optic nerve, imo evil braaiinns stalking monstra hypothalamus adventus resi hippocampus dentevil vultus brain comedat cerebella pitiutary gland viventium.\nQui optic gland animated corpse, brains cricket bat substantia nigra max brucks spinal cord terribilem incessu brains zomby. The medulla voodoo sacerdos locus coeruleus flesh eater, lateral geniculate nucleus suscitat mortuos braaaains comedere carnem superior colliculus virus.",
-				Tags = new List<string> { "Orchard Core", "NET Core", "ASP.NET", "Docker", "Featured" },
+				Tags = new List<string> { "Orchard Core", "NET Core", "ASP.NET", "Docker" },
 				Published = true,
+				Featured = true,
 			}},
 			{ new Project() {
 				Uid = "cascade-terrace-landscaping",
@@ -46,8 +39,9 @@ namespace AzureDeveloperPortfolio.Data
 				},
 				ProfileScreenshot = "cascade-terrace-landscaping-home.png",
 				RepositoryURL = "https://github.com/artemislee88/CascadeTerraceLandscaping",
-				Tags = new List<string> { "NET Core 6.0", "ASP.NET", "Docker" , "Featured" },
-				Published = true
+				Tags = new List<string> { "NET Core 6.0", "ASP.NET", "Docker" },
+				Published = true,
+				Featured = true,
 			}},
 			{ new Project() {
 				Uid = "southwest-shiner-league",
@@ -86,7 +80,7 @@ namespace AzureDeveloperPortfolio.Data
 				LastUpdated = DateTime.Now.AddDays(-6),
 				Summary = "<a href='http://www.zombieipsum.com/' target='_blank'>Zombie Ipsum</a>Zombie ipsum brains reversus ab cerebellum viral inferno, brein nam rick mend grimes malum cerveau cerebro. De carne cerebro lumbering animata cervello corpora quaeritis. Summus thalamus brains sit​​, morbo basal ganglia vel maleficia? De braaaiiiins apocalypsi gorger omero prefrontal cortex undead survivor fornix dictum mauris.\nHi brains mindless mortuis limbic cortex soulless creaturas optic nerve, imo evil braaiinns stalking monstra hypothalamus adventus resi hippocampus dentevil vultus brain comedat cerebella pitiutary gland viventium.\nQui optic gland animated corpse, brains cricket bat substantia nigra max brucks spinal cord terribilem incessu brains zomby. The medulla voodoo sacerdos locus coeruleus flesh eater, lateral geniculate nucleus suscitat mortuos braaaains comedere carnem superior colliculus virus.",
 				Hosting = new List<string> { "Azure Web App", "Azure Functions" },
-				Tags = new List<string> { "ReactJS", "NodeJS", "JavaScript", "Docker", "Featured" },
+				Tags = new List<string> { "ReactJS", "NodeJS", "JavaScript", "Docker"},
 				Published = true
 			}},
 			{ new Project() {
@@ -96,8 +90,9 @@ namespace AzureDeveloperPortfolio.Data
 				LastUpdated = DateTime.Now.AddDays(-7),
 				Summary = "<a href='https://www.bobrosslipsum.com/' target='_blank'>Bob Ross Lipsum</a>\nI want everbody to be happy. That's what it's all about. It's so important to do something every day that will make you happy. Don't hurry. Take your time and enjoy. See there, told you that would be easy. It's hard to see things when you're too close. Take a step back and look.\nMaybe there was an old trapper that lived out here and maybe one day he went to check his beaver traps, and maybe he fell into the river and drowned. Making all those little fluffies that live in the clouds. I will take some magic white, and a little bit of Vandyke brown and a little touch of yellow. This is your world.\nWe want to use a lot pressure while using no pressure at all. If we're going to have animals around we all have to be concerned about them and take care of them.",
 				Hosting = new List<string> {  "Azure Container App", "Azure CosmosDB" },
-				Tags = new List<string> { "Python", "Django", "MongoDB", "ReactJS", "Featured" },
-				Published = true
+				Tags = new List<string> { "Python", "Django", "MongoDB", "ReactJS" },
+				Published = true,
+				Featured = true,
 			}},
 			{ new Project() {
 				Uid = "watkins-family-reunion",

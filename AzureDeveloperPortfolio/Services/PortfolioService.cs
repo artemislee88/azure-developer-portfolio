@@ -5,7 +5,6 @@ namespace AzureDeveloperPortfolio.Services
 {
 	public class PortfolioService : IPortfolioService
 	{
-		private static readonly string Featured = nameof(Featured);
 		private static readonly string Index = nameof(Index);
 		private readonly IDbContextFactory<PortfolioContext> _contextFactory;
 
@@ -16,7 +15,6 @@ namespace AzureDeveloperPortfolio.Services
 		public async Task<string> CreateProjectAsync(Project newProject)
 		{
 			using PortfolioContext context = _contextFactory.CreateDbContext();
-			newProject.LastUpdated = new DateTime();
 			await HandleTagsAsync(context, newProject);
 			context.Add(newProject);
 			await context.SaveChangesAsync();
@@ -34,6 +32,21 @@ namespace AzureDeveloperPortfolio.Services
 				return null;
 			}
 			return project;
+		}
+
+		public async Task<List<Project>?> GetFeatureProjects()
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			List<Project>? featured = await context.Projects
+				.AsNoTracking()
+				.Where(p => p.Featured == true)
+				.OrderBy(p => p.LastUpdated)
+				.ToListAsync();
+			if (featured is null || !featured.Any())
+			{
+				return null;
+			}
+			return featured;
 		}
 
 		public async Task UpdateProjectAsync(Project updatedProject)
@@ -201,8 +214,8 @@ namespace AzureDeveloperPortfolio.Services
 					{
 						removedTag.Projects.Remove(deletedProjectSummary);
 
-						// If Tag.Projects is empty and Tag is not the "featured" Tag, delete Tag
-						if (removedTag.TagName != nameof(Featured) && !removedTag.Projects.Any())
+						// If Tag.Projects is empty, delete Tag
+						if (!removedTag.Projects.Any())
 						{
 							context.Remove(removedTag);
 						}
@@ -263,6 +276,22 @@ namespace AzureDeveloperPortfolio.Services
 			}
 			return tag;
 		}
+
+		public async Task<List<Tag>?> GetTagsAsync()
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			List<Tag>? tags = await context.Tags
+				.OrderBy(t => t.TagName)
+				.ToListAsync();
+
+			if (tags is null)
+			{
+				return null;
+			}
+
+			return tags;
+		}
+
 
 		public async Task<List<ProjectSummary>?> QueryProjectsByTagAsync(List<string> tagNames)
 		{

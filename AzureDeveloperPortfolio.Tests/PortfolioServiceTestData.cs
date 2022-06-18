@@ -5,7 +5,6 @@ namespace AzureDeveloperPortfolio.Tests
 	public class PortfolioServiceTestData
 	{
 		private static readonly string Index = nameof(Index);
-		private static readonly string Featured = nameof(Featured);
 
 		private readonly static Dictionary<string, TagTest> tags = new()
 		{
@@ -64,11 +63,6 @@ namespace AzureDeveloperPortfolio.Tests
 					ProjectUpdate = new() {
 						"mr-mechanical-auto", "southwest-shiner-league" },
 					QueryGroup = "B"
-				}},
-			{ nameof(Featured), new TagTest{
-					ProjectCreate = new() { },
-					ProjectUpdate = new() {
-						"mr-mechanical-auto"}
 				}},
 		};
 
@@ -259,7 +253,7 @@ namespace AzureDeveloperPortfolio.Tests
 			List<object[]> deleteTagTests = new();
 			foreach (string tagName in tags.Keys)
 			{
-				if (!tagName.Equals(nameof(Featured)) && tags[tagName].ProjectUpdate.All(p => p.Equals(projects.Last().Value.Uid)))
+				if (tags[tagName].ProjectUpdate.All(p => p.Equals(projects.Last().Value.Uid)))
 				{
 					deleteTagTests.Add(new object[] { tagName });
 				}

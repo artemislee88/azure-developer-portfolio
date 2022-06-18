@@ -1,0 +1,104 @@
+﻿@page "/projects/{projectUid}"
+
+<PageTitle>Portfolio @Project?.ProjectName</PageTitle>
+
+<div>
+    @if (Loading)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+    else if (@Project is not null)
+    {
+        <h1>@Project.ProjectName</h1>
+        <p>@Project.ShortDescription</p>
+
+        @if (@Project.Tags.Any())
+        {
+            <p>
+                @foreach (string tag in @Project.Tags)
+                {
+                    <span class="badge bg-secondary mx-1">@tag</span>
+                }
+            </p>
+        }
+        <p>Last updated: @Project.LastUpdated</p>
+        <hr />
+        @if (@Project.Screenshots.Any())
+        {
+            @foreach (string imgSrc in @Project.Screenshots)
+            {
+                <img src="@imgSrc" class="img-fluid" alt="@($"{Project.ProjectName} Screenshot")" />
+            }
+        }
+        <hr />
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">Repository URL</th>
+                    <td>
+                        <a href="@Project.RepositoryURL" target="_blank">@Project.RepositoryURL</a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row">Site URL</th>
+                    <td>
+                        <a href="@Project.SiteURL" target="_blank">@Project.SiteURL</a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row">Hosting</th>
+                    <td>
+                        @if (@Project.Hosting.Any())
+                        {
+                            string lastHost = @Project.Hosting.Last();
+                            foreach (string host in @Project.Hosting)
+                            {
+                                if (host.Equals(lastHost))
+                                {
+                                    <span>@host</span>
+                                }
+                                else
+                                {
+                                    <span>@host, </span>
+                                }
+                            }
+                        }
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row">Site URL</th>
+                    <td>
+                        <a href="@Project.SiteURL" target="_blank">@Project.SiteURL</a>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+        <p>
+            @((MarkupString)@Project.Summary.Replace("\n", "<br /><br />"));
+        </p>
+
+
+    }
+    else
+    {
+        <p>Could not find the requested project. </p>
+        <p>View a list of projects</p>
+        <button type="button" class="btn btn-primary" @onclick="@ToggleProjectList">Open Project List</button>
+        <p>
+            Or, visit the <a href="/projects/" class="btn btn-primary">Projects</a> Page to search for a project.
+        </p>
+    }
+
+</div>
+
+@if (ShowProjectIndex)
+{
+    <ProjectIndex ProjectList="@Index?.Projects" Toggle="@ToggleProjectList" />
+}
