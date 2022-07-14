@@ -6,11 +6,8 @@ namespace AzureDeveloperPortfolio.Pages
 {
 	public partial class Projects
 	{
-		//[Inject]
-		//protected NavigationManager? NavigationManager { get; set; }
 		[Inject]
 		protected IPortfolioService? PortfolioService { get; set; }
-
 		protected bool Loading { get; set; } = true;
 		protected bool ShowProjectIndex { get; set; }
 		protected List<Tag>? Tags { get; set; }
@@ -25,6 +22,7 @@ namespace AzureDeveloperPortfolio.Pages
 				try
 				{
 					Featured = await PortfolioService.GetFeatureProjects();
+
 					Loading = false;
 				}
 				catch (Exception ex)
@@ -43,11 +41,10 @@ namespace AzureDeveloperPortfolio.Pages
 				{
 					Index = await PortfolioService.GetTagAsync("Index");
 					Tags = await PortfolioService.GetTagsAsync();
-					Console.WriteLine(Tags?.Count);
+
 				}
 			}
 		}
-
 
 
 	}

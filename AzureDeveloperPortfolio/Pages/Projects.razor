@@ -4,13 +4,10 @@
 
 <div>
     <h1>Projects</h1>
-    @*    @if (Index is not null)
-    {*@
+
     <button type="button" class="btn btn-secondary" @onclick="() => ProjectIndex?.Open()">Project Index</button>
 
     <ProjectIndex Index="@Index?.Projects" @ref="ProjectIndex" />
-    @*   }*@
-
 
 
     @if (Loading)
@@ -20,7 +17,7 @@
     }
     else
     {
-        if (Featured is not null && Featured.Any())
+      if (Featured is not null && Featured.Any())
         {
             @foreach (Project project in Featured)
             {
@@ -30,14 +27,8 @@
                     </div>
                     <div class="card-body d-flex align-items-stretch">
                         <div class="w-50">
-                            @if (project.ProfileScreenshot == string.Empty)
-                            {
-                                <img src="/img/default.jpg" class="img-fluid rounded " alt=@project.ProjectName />
-                            }
-                            else
-                            {
-                                <img src=@project.ProfileScreenshot class="rounded" alt=@project.ProjectName />
-                            }
+                            <img src="/img/default.jpg" class="img-fluid rounded " alt=@project.ProjectName />
+
                         </div>
                         <div class="w-50 ms-5 text-center">
                             <div class="h-100 d-flex flex-column justify-content-end">

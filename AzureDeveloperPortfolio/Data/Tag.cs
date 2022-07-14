@@ -12,7 +12,9 @@
 		public string? ETag { get; set; }
 		public List<ProjectSummary> Projects { get; set; } = new();
 
-		public override string ToString() =>
-			$"{TagName} tagged by {Projects.Count} projects.";
+		public override string ToString()
+		{
+			return $"{TagName} tagged by {Projects.Count} projects.";
+		}
 	}
 }

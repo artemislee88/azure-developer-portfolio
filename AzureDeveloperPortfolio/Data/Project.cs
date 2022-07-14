@@ -26,8 +26,9 @@
 		public List<string> DeploymentEvents { get; set; } = new();
 		public string ETag { get; set; } = string.Empty;
 
-		public override string ToString() =>
-			$"{Uid} | {ProjectName} - Last Updated {LastUpdated}";
-
+		public override string ToString()
+		{
+			return $"{Uid} | {ProjectName} - Last Updated {LastUpdated}";
+		}
 	}
 }

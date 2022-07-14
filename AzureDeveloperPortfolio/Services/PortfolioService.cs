@@ -8,9 +8,10 @@ namespace AzureDeveloperPortfolio.Services
 		private static readonly string Index = nameof(Index);
 		private readonly IDbContextFactory<PortfolioContext> _contextFactory;
 
-		public PortfolioService(IDbContextFactory<PortfolioContext> contextFactory) =>
+		public PortfolioService(IDbContextFactory<PortfolioContext> contextFactory)
+		{
 			_contextFactory = contextFactory;
-
+		}
 
 		public async Task<string> CreateProjectAsync(Project newProject)
 		{
@@ -27,11 +28,7 @@ namespace AzureDeveloperPortfolio.Services
 			Project? project = await context.Projects
 				.WithPartitionKey(projectUid)
 				.SingleOrDefaultAsync(p => p.Uid == projectUid);
-			if (project is null)
-			{
-				return null;
-			}
-			return project;
+			return project is null ? null : project;
 		}
 
 		public async Task<List<Project>?> GetFeatureProjects()
@@ -42,11 +39,7 @@ namespace AzureDeveloperPortfolio.Services
 				.Where(p => p.Featured == true)
 				.OrderBy(p => p.LastUpdated)
 				.ToListAsync();
-			if (featured is null || !featured.Any())
-			{
-				return null;
-			}
-			return featured;
+			return featured is null || !featured.Any() ? null : featured;
 		}
 
 		public async Task UpdateProjectAsync(Project updatedProject)
@@ -284,12 +277,7 @@ namespace AzureDeveloperPortfolio.Services
 				.OrderBy(t => t.TagName)
 				.ToListAsync();
 
-			if (tags is null)
-			{
-				return null;
-			}
-
-			return tags;
+			return tags is null ? null : tags;
 		}
 
 
@@ -318,4 +306,5 @@ namespace AzureDeveloperPortfolio.Services
 		}
 
 	}
+
 }

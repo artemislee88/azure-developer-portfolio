@@ -5,7 +5,7 @@ namespace AzureDeveloperPortfolio.Data
 {
 	public class DBInitializer
 	{
-		public async static void Initialize(IDbContextFactory<PortfolioContext> contextFactory)
+		public static async void Initialize(IDbContextFactory<PortfolioContext> contextFactory)
 		{
 			PortfolioService service = new(contextFactory);
 			foreach (Project? project in projects)
@@ -14,7 +14,7 @@ namespace AzureDeveloperPortfolio.Data
 			}
 		}
 
-		static readonly List<Project> projects = new()
+		private static readonly List<Project> projects = new()
 		{
 			{ new Project() {
 				Uid = "eloquent-lee-blog",
