@@ -9,7 +9,7 @@ namespace AzureDeveloperPortfolio.Pages
 		[Parameter]
 		public string? ProjectUid { get; set; }
 		[Inject]
-		protected IPortfolioService? PortfolioService { get; set; }
+		protected IPortfolioService? PortfolioService { get; set; } 
 		protected bool Loading { get; set; } = true;
 		protected bool ShowProjectIndex { get; set; }
 		protected Project? Project { get; set; }
