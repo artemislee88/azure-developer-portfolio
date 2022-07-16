@@ -29,7 +29,7 @@ namespace AzureDeveloperPortfolio.Pages
 			{
 				Console.Error.WriteLine(ex);
 			}
-			//return base.OnParametersSetAsync();
+			// return base.OnParametersSetAsync();
 		}
 
 		protected override async Task OnAfterRenderAsync(bool firstRender)
