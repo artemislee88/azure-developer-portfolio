@@ -1,0 +1,50 @@
+﻿<div class="modal  @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Project Index</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="() => Close()"></button>
+            </div>
+            <div class="modal-body">
+                @if (Index is null || !Index.Any())
+                {
+                    <p>no projects are available to view </p>
+                }
+                else
+                {
+                    @foreach (ProjectSummary project in Index)
+                    {
+                        <div class="card my-2">
+                            <div class="card-header h5">
+                                @project.ProjectName
+                            </div>
+
+                            <div class="card-body">
+                                <div class="d-flex flex-row justify-content-between">
+                                    <div class="text-secondary">
+                                        <div>
+                                            @project.ShortDescription
+                                        </div>
+                                        <div class="small fst-italic">- @project.LastUpdated</div>
+                                    </div>
+                                    <div class="align-self-start">
+                                        <a href="/projects/@project.ProjectUid" class="btn btn-sm btn-secondary ">View</a>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}

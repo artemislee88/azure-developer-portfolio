@@ -7,7 +7,6 @@ namespace AzureDeveloperPortfolio.Tests
 	[TestCaseOrderer("AzureDeveloperPortfolio.Tests.Orderers.PriorityOrderer", "AzureDeveloperPortfolio.Tests")]
 	public class PortfolioServiceTests : IClassFixture<TestDbContextFactory>
 	{
-		private static readonly string Featured = nameof(Featured);
 		public TestDbContextFactory ContextFactory { get; }
 		public PortfolioServiceTests(TestDbContextFactory contextFactory) => ContextFactory = contextFactory;
 
@@ -186,15 +185,6 @@ namespace AzureDeveloperPortfolio.Tests
 			Assert.NotNull(actualTag);
 			Assert.All(actualSummaries, item => Assert.IsType<ProjectSummary>(item));
 			Assert.Equal(expectedSummaries, actualSummaries);
-		}
-
-		[Fact(DisplayName = "DeleteProject_FeaturedTag_Exists"), TestPriority(00404)]
-		public void DeleteProjectAsyncTest_FeaturedTagExists()
-		{
-			PortfolioService service = new(ContextFactory);
-			Tag? featuredTag = service.GetTagAsync(nameof(Featured)).Result;
-
-			Assert.NotNull(featuredTag);
 		}
 
 		[Theory(DisplayName = "QueryProjectsByTag_Results"), TestPriority(00500)]

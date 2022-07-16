@@ -5,18 +5,17 @@ namespace AzureDeveloperPortfolio.Services
 {
 	public class PortfolioService : IPortfolioService
 	{
-		private static readonly string Featured = nameof(Featured);
 		private static readonly string Index = nameof(Index);
 		private readonly IDbContextFactory<PortfolioContext> _contextFactory;
 
-		public PortfolioService(IDbContextFactory<PortfolioContext> contextFactory) =>
+		public PortfolioService(IDbContextFactory<PortfolioContext> contextFactory)
+		{
 			_contextFactory = contextFactory;
-
+		}
 
 		public async Task<string> CreateProjectAsync(Project newProject)
 		{
 			using PortfolioContext context = _contextFactory.CreateDbContext();
-			newProject.LastUpdated = new DateTime();
 			await HandleTagsAsync(context, newProject);
 			context.Add(newProject);
 			await context.SaveChangesAsync();
@@ -29,11 +28,18 @@ namespace AzureDeveloperPortfolio.Services
 			Project? project = await context.Projects
 				.WithPartitionKey(projectUid)
 				.SingleOrDefaultAsync(p => p.Uid == projectUid);
-			if (project is null)
-			{
-				return null;
-			}
-			return project;
+			return project is null ? null : project;
+		}
+
+		public async Task<List<Project>?> GetFeatureProjects()
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			List<Project>? featured = await context.Projects
+				.AsNoTracking()
+				.Where(p => p.Featured == true)
+				.OrderBy(p => p.LastUpdated)
+				.ToListAsync();
+			return featured is null || !featured.Any() ? null : featured;
 		}
 
 		public async Task UpdateProjectAsync(Project updatedProject)
@@ -201,8 +207,8 @@ namespace AzureDeveloperPortfolio.Services
 					{
 						removedTag.Projects.Remove(deletedProjectSummary);
 
-						// If Tag.Projects is empty and Tag is not the "featured" Tag, delete Tag
-						if (removedTag.TagName != nameof(Featured) && !removedTag.Projects.Any())
+						// If Tag.Projects is empty, delete Tag
+						if (!removedTag.Projects.Any())
 						{
 							context.Remove(removedTag);
 						}
@@ -264,6 +270,17 @@ namespace AzureDeveloperPortfolio.Services
 			return tag;
 		}
 
+		public async Task<List<Tag>?> GetTagsAsync()
+		{
+			using PortfolioContext context = _contextFactory.CreateDbContext();
+			List<Tag>? tags = await context.Tags
+				.OrderBy(t => t.TagName)
+				.ToListAsync();
+
+			return tags is null ? null : tags;
+		}
+
+
 		public async Task<List<ProjectSummary>?> QueryProjectsByTagAsync(List<string> tagNames)
 		{
 			using PortfolioContext context = _contextFactory.CreateDbContext();
@@ -289,4 +306,5 @@ namespace AzureDeveloperPortfolio.Services
 		}
 
 	}
+
 }

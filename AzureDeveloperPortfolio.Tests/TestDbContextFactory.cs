@@ -1,5 +1,4 @@
-﻿using AzureDeveloperPortfolio.Data;
-using AzureDeveloperPortfolio.Services;
+﻿using AzureDeveloperPortfolio.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -9,7 +8,6 @@ namespace AzureDeveloperPortfolio.Tests
 	{
 		private readonly DbContextOptions<PortfolioContext> _options;
 		private readonly IConfiguration _config;
-		private static readonly string Featured = nameof(Featured);
 
 		public TestDbContextFactory()
 		{
@@ -30,8 +28,6 @@ namespace AzureDeveloperPortfolio.Tests
 			using PortfolioContext? context = CreateDbContext();
 			context.Database.EnsureDeleted();
 			context.Database.EnsureCreated();
-			context.Tags.Add(new Tag(Featured));
-			context.SaveChangesAsync();
 		}
 
 		public PortfolioContext CreateDbContext()

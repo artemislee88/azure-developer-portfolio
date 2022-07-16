@@ -1,6 +1,8 @@
+using Azure.Identity;
 using AzureDeveloperPortfolio.Data;
 using AzureDeveloperPortfolio.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,18 @@ builder.Services.AddDbContextFactory<PortfolioContext>(
 			builder.Configuration["Cosmos:DatabaseName"]
 			?? throw new InvalidOperationException("Connection string 'PortfolioContext' not found."));
 	});
+IConfiguration storage = builder.Configuration.GetSection("Storage:ServiceUrl");
+builder.Services.AddAzureClients(builder =>
+{
+
+	//builder.UseCredential(new DefaultAzureCredential());
+
+	builder.AddBlobServiceClient(new Uri("https://127.0.0.1:10000/")).WithCredential(new DefaultAzureCredential());
+
+});
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+
 
 WebApplication app = builder.Build();
 
@@ -33,16 +46,16 @@ else
 	app.UseDeveloperExceptionPage();
 }
 
-//using IServiceScope? scope = app.Services.CreateScope();
-//IDbContextFactory<PortfolioContext> contextfactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PortfolioContext>>();
-//PortfolioContext context = contextfactory.CreateDbContext();
-//
-// await context.Database.EnsureDeletedAsync();
-//await context.Database.EnsureCreatedAsync();
-//if (context.Projects.Count() == 0)
-//{
-//	DBInitializer.Initialize(contextfactory);
-//}
+using IServiceScope? scope = app.Services.CreateScope();
+IDbContextFactory<PortfolioContext> contextfactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PortfolioContext>>();
+PortfolioContext context = contextfactory.CreateDbContext();
+
+//await context.Database.EnsureDeletedAsync();
+await context.Database.EnsureCreatedAsync();
+if (context.Projects.Count() == 0)
+{
+	DBInitializer.Initialize(contextfactory);
+}
 
 app.UseHttpsRedirection();
 
